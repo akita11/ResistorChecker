@@ -43,7 +43,7 @@ void setup() {
 	FastLED.addLeds<WS2812B, LED_DATA_PIN, GRB>(leds, NUM_LEDS);
 	FastLED.setBrightness(128);
 	FastLED.clear();
-	showLED(0, 255, 0);  // green
+	showLED(0, 0, 10);  // blue (idle)
 	pinMode(PIN_BZ, OUTPUT);
 
 }
@@ -52,8 +52,6 @@ void loop() {
 	M5.update();
 	if (M5.BtnA.wasClicked()) {
 		range = (range + 1) %2;
-		if (range == 0) showLED(0, 255, 0);  // green
-		else showLED(0, 0, 255); // blue
 		delay(500);
 	}
 	float V = readVoltage();
@@ -62,22 +60,22 @@ void loop() {
 
 	if (R > Rmin && R < Rmax){
 		// OK
-		showLED(0, 20,  0); // green
+		showLED(0, 40,  0); // green
 		tone(PIN_BZ, 880); // 880Hz
 	}
 	else if (R < Rmin) {
 		// R is too small
-		showLED(20, 0, 0); // red
+		showLED(40, 0, 0); // red
 		tone(PIN_BZ, 440); // 440Hz
 	}
 	else if (R > Rmax && R < Rdisconnect) {
 		// R is too large
 		showLED(20, 0, 20); // purple
-		tone(PIN_BZ, 440); // 440Hz
+		tone(PIN_BZ, 220); // 220Hz
 	}
 	else {
-		// disconnected
-		showLED(0, 0, 0); // black
+		// disconnected / idle
+		showLED(0, 0, 10); // blue (idle)
 		noTone(PIN_BZ);
 	}
 }
