@@ -33,9 +33,19 @@ float calcResistance(float V, float Rref) {
 
 uint8_t range = 0;
 
-float Rmin = 900;
-float Rmax = 1100;
-float Rdisconnect = 1e6;
+float Rstd = 1000; // [ohm]
+float Rmin = Rstd * 0.9; // -10%
+float Rmax = Rstd * 1.1; // +10%
+float Rdisconnect = 1e6; // 1MEG
+
+void setTone(int freq) {
+	printf("%d\n", freq);
+	if (freq > 0) {
+		ledcWriteTone(0, freq);
+	} else {
+		ledcWrite(0, 0);
+	}
+}
 
 void setup() {
 	auto cfg = M5.config();
@@ -44,8 +54,9 @@ void setup() {
 	FastLED.setBrightness(128);
 	FastLED.clear();
 	showLED(0, 0, 10);  // blue (idle)
-	pinMode(PIN_BZ, OUTPUT);
-
+  ledcSetup(0, 24000, 11);
+	ledcWrite(0, 0);
+  ledcAttachPin(PIN_BZ, 0);
 }
 
 void loop() {
@@ -55,27 +66,27 @@ void loop() {
 		delay(500);
 	}
 	float V = readVoltage();
-	float R = calcResistance(V, 1000);
-	printf("%f / %f\n", V, R);
+	float R = calcResistance(V, Rstd);
+//	printf("%f / %f\n", V, R);
 
 	if (R > Rmin && R < Rmax){
 		// OK
 		showLED(0, 40,  0); // green
-		tone(PIN_BZ, 880); // 880Hz
+		setTone(440);
 	}
 	else if (R < Rmin) {
 		// R is too small
 		showLED(40, 0, 0); // red
-		tone(PIN_BZ, 440); // 440Hz
+		setTone(880);
 	}
 	else if (R > Rmax && R < Rdisconnect) {
 		// R is too large
 		showLED(20, 0, 20); // purple
-		tone(PIN_BZ, 220); // 220Hz
+		setTone(220);
 	}
 	else {
 		// disconnected / idle
 		showLED(0, 0, 10); // blue (idle)
-		noTone(PIN_BZ);
+		setTone(0);
 	}
 }
