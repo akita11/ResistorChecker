@@ -5,18 +5,21 @@
 #define NUM_LEDS 1
 static CRGB leds[NUM_LEDS];
 
-/*
+#if defined(ARDUINO_M5tack_ATOMS3)
 // for ATOMS3 Lite
 // G1/G2/V/D
 #define PIN_ADC  1
 #define PIN_BZ   2
 #define PIN_LED  35
-*/
+#elif defined(ARDUINO_M5TACK_ATOM)
 // for ATOM Lite
 // G1/G2/V/D
-#define PIN_ADC  32
-#define PIN_BZ   26
+//#define PIN_ADC  32 // for Unit (Grove)
+//#define PIN_BZ   26 // for Unit (Grove)
+#define PIN_ADC  33 // for Base
+#define PIN_BZ   23 // for Base
 #define PIN_LED  27
+#endif
 
 void showLED(int r, int g, int b) {
 	leds[0] = CRGB(r, g, b);
