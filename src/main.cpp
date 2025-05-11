@@ -11,7 +11,7 @@ static CRGB leds[NUM_LEDS];
 #define PIN_ADC  1
 #define PIN_BZ   2
 #define PIN_LED  35
-#elif defined(ARDUINO_M5TACK_ATOM)
+#elif defined(ARDUINO_M5Stack_ATOM)
 // for ATOM Lite
 // G1/G2/V/D
 //#define PIN_ADC  32 // for Unit (Grove)
@@ -48,7 +48,7 @@ uint8_t range = 0;
 float Rstd = 1000; // [ohm]
 float Rmin = Rstd * 0.9; // -10%
 float Rmax = Rstd * 1.1; // +10%
-float Rdisconnect = Rstd * 20;
+float Rdisconnect = Rstd * 10;
 
 void setTone(int freq) {
 	if (freq > 0) {
@@ -61,9 +61,8 @@ void setTone(int freq) {
 void setup() {
 	auto cfg = M5.config();
 	M5.begin(cfg);
-	FastLED.addLeds<WS2812B, PIN_LED, GRB>(leds, NUM_LEDS);
-	FastLED.setBrightness(128);
-	FastLED.clear();
+	FastLED.addLeds<WS2811, PIN_LED, GRB>(leds, NUM_LEDS);
+	FastLED.setBrightness(30);
 	showLED(0, 0, 10);  // blue (idle)
   ledcSetup(0, 24000, 11);
 	ledcWrite(0, 0);
@@ -89,8 +88,6 @@ void loop() {
 */
 	float V = readVoltage();
 	float R = calcResistance(V, Rstd);
-	printf("%f / %f\n", V, R);
-
 	if (R > Rmin && R < Rmax){
 		// OK
 		st = 1;
@@ -108,6 +105,8 @@ void loop() {
 		st = 0;
 	}
 
+	printf("%d / %f / %f\n", st, V, R);
+
 	if (st != st0){
 		switch (st){
 			case 0: setTone(0);   showLED( 0,  0, 10); break; // blue
@@ -118,4 +117,3 @@ void loop() {
 		st0 = st;
 	}
 }
-
